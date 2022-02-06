@@ -1,0 +1,48 @@
+    - name: Create /backup directory for backup
+      file:
+        path: /backup
+        state: directory
+
+    - name: Archive /etc directory
+      archive:
+        path: 
+        - /etc
+        dest: "/backup/etc.tar.gz"
+        format: gz
+
+    - name: Archive /var/www directory
+      archive:
+        path: 
+        - /var/www
+        dest: "/backup/www.tar.gz"
+        format: gz
+
+    - name: Mysqldump all databases
+      mysql_db:
+        login_user: root
+        login_password: "{{ mysql_root_password }}"
+        encoding: utf8
+        name: all
+        state: dump
+        target: "/backup/mysqldump.sql"
+
+    - name: Fetch mysqldump.sql
+      fetch:
+        dest: "{{ backup_directory }}"
+        src: "/backup/mysqldump.sql"
+
+    - name: Fetch /etc archive
+      fetch:
+        dest: "{{ backup_directory }}"
+        src: "/backup/etc.tar.gz"
+
+    - name: Fetch /var/www archive
+      fetch:
+        dest: "{{ backup_directory }}"
+        src: "/backup/www.tar.gz"
+
+    - name: Delete tmp directory
+      file:
+        path: "/backup/"
+        state: absent
+

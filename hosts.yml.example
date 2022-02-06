@@ -11,6 +11,8 @@ all:
   vars:
     ansible_python_interpreter: "/usr/bin/python3"
     backup_directory: "/home/user/backup"
+    simplecloud_token: "A1b2C3A1b2C3A1b2C3A1b2C3A1b2C3"
+    simplecloud_dns_id: 1234
     mysql_site_user: MYSQL_SITE_USER
     mysql_site_password: MYSQL_SITE_PASSWORD
     mysql_root_password: MYSQL_ROOT_PASSWORD
