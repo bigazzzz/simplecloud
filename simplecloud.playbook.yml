@@ -5,7 +5,7 @@
     - name: Create temporary directory for backup
       tempfile:
         state: directory
-        suffix: backup
+        suffix: .backup
       register: backup_dir
 
     - name: Archive /etc directory
@@ -15,3 +15,39 @@
         dest: "{{ backup_dir.path }}/etc.tar.gz"
         format: gz
 
+    - name: Archive /var/www directory
+      archive:
+        path: 
+        - /var/www
+        dest: "{{ backup_dir.path }}/www.tar.gz"
+        format: gz
+
+    - name: Mysqldump all databases
+      mysql_db:
+        login_user: root
+        login_password: "{{ mysql_root_password }}"
+        encoding: utf8
+        name: all
+        state: dump
+        target: "{{ backup_dir.path }}/mysqldump.sql"
+
+    - name: Fetch mysqldump.sql
+      fetch:
+        dest: "{{ backup_directory }}"
+        src: "{{ backup_dir.path }}/mysqldump.sql"
+
+    - name: Fetch /etc archive
+      fetch:
+        dest: "{{ backup_directory }}"
+        src: "{{ backup_dir.path }}/etc.tar.gz"
+
+    - name: Fetch /var/www archive
+      fetch:
+        dest: "{{ backup_directory }}"
+        src: "{{ backup_dir.path }}/www.tar.gz"
+
+    - name: Delete tmp directory
+      file:
+        path: "{{ backup_dir.path }}/"
+        state: absent
+        

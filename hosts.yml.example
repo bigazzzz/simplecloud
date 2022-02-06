@@ -10,6 +10,7 @@ all:
       ansible_password: NEWSERVER_ROOT_PASSWORD
   vars:
     ansible_python_interpreter: "/usr/bin/python3"
+    backup_directory: "/home/user/backup"
     mysql_site_user: MYSQL_SITE_USER
     mysql_site_password: MYSQL_SITE_PASSWORD
     mysql_root_password: MYSQL_ROOT_PASSWORD
