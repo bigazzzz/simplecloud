@@ -32,6 +32,8 @@
         headers:
           Authorization: "Bearer {{ simplecloud_token }}"
         body:
+          name: "{{ item.name }}"
+          type: "{{ item.type }}"
           data: "{{ hostvars['newserver'].ansible_host }}"
       register: records
       retries: 10
@@ -39,3 +41,15 @@
       until: records.status == 204
       loop: "{{ result.json.domain_records }}"
       when: item.data == "{{ hostvars['oldserver'].ansible_host }}"      
+
+    - name: Wait for update 
+      shell: host -t A bigazzzz.ru 8.8.8.8 | tail -1
+      until: '"{{ hostvars[''oldserver''].ansible_host }}" not in dns.stdout'
+      retries: 25
+      delay: 30
+      register: dns
+
+    - name: View result for bigazzzz.ru
+      debug:
+        msg: "{{ dns.stdout }}"
+
