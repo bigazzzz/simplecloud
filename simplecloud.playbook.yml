@@ -1,21 +1,29 @@
 ---
-# - hosts: oldserver
-#   gather_facts: true
-#   roles:
-#   - backup
+- hosts: oldserver
+  gather_facts: true
+  roles:
+  - backup
+
+- hosts: localhost
+  gather_facts: false
+  roles:
+  - simplecloud_dns
 
 - hosts: newserver
   gather_facts: true
   roles:
-  # - create_user
-  # - nginx
-  # - certbot
-  # - php_fpm
-  # - mysql
   - default_software
+  - create_user
+  - lemp
+  - restore
+  # = certbox
 
 
-# - hosts: localhost
-#   gather_facts: false
-#   roles:
-#   - simplecloud_dns
+  tasks:
+  - name: Add root public key
+    authorized_key:
+      user: root
+      key: "{{ item }}"
+    with_file:
+      - /home/biga/.ssh/id_rsa.pub
+      - /home/biga/.ssh/bigazzzz.pub
