@@ -1,0 +1,15 @@
+all:
+  hosts:
+    oldserver:
+      ansible_host: 212.212.212.212
+      ansible_user: root
+      ansible_password: OLDSERVER_ROOT_PASSWORD
+    newserver:
+      ansible_host: 212.212.212.213
+      ansible_user: root
+      ansible_password: NEWSERVER_ROOT_PASSWORD
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3"
+    mysql_site_user: MYSQL_SITE_USER
+    mysql_site_password: MYSQL_SITE_PASSWORD
+    mysql_root_password: MYSQL_ROOT_PASSWORD

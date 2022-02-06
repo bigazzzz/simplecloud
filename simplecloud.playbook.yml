@@ -1,0 +1,17 @@
+---
+- hosts: oldserver
+  gather_facts: false
+  tasks:
+    - name: Create temporary directory for backup
+      tempfile:
+        state: directory
+        suffix: backup
+      register: backup_dir
+
+    - name: Archive /etc directory
+      archive:
+        path: 
+        - /etc
+        dest: "{{ backup_dir.path }}/etc.tar.gz"
+        format: gz
+
