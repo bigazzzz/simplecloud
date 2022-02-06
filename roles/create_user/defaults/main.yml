@@ -1,0 +1,21 @@
+Debian:
+  packages:
+    - curl
+    - mc
+    - tmux
+    - git
+    - vim
+    - wget
+    - zsh
+    - python3
+
+CentOS:
+  packages:
+    - curl
+    - mc
+    - tmux
+    - git
+    - vim
+    - wget
+    - zsh
+    - python3

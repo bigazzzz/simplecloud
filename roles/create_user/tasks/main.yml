@@ -1,0 +1,46 @@
+---
+
+  - name: Install epel-release on CentOS
+    yum:
+      name: epel-release
+      state: present
+      update_cache: yes
+    when: ansible_facts['distribution'] == "CentOS"
+
+  - name: Install needed packages on CentOS
+    yum:
+      name: "{{ CentOS.packages }}"
+      state: present
+      update_cache: yes
+    when: ansible_facts['distribution'] == "CentOS"
+
+  - name: Install needed packages on Debian-based
+    apt:
+      name: "{{ Debian.packages }}"
+      state: present
+      update_cache: yes
+      autoclean: yes
+      autoremove: yes
+    when: ansible_facts['os_family'] == "Debian"
+
+
+  - name: Create user
+    user:
+      name: biga
+      state: present
+      createhome: yes
+      shell: /bin/zsh
+
+  - name: Add root public key
+    authorized_key:
+      user: biga
+      key: "{{ item }}"
+    with_file:
+      - /home/biga/.ssh/id_rsa.pub
+      - /home/biga/.ssh/bigazzzz.pub
+
+  - name: Sudo without password for user biga
+    copy:
+      content: 'biga ALL=(ALL:ALL) NOPASSWD:ALL'
+      dest: /etc/sudoers.d/biga_nopasswd
+      mode: 0440
