@@ -1,0 +1,41 @@
+---
+
+    - name: Get domain records
+      uri:
+        url: "https://api.simplecloud.ru/v3/domains/{{ simplecloud_dns_id }}/records"
+        method: GET
+        return_content: yes
+        status_code: 200
+        body_format: json
+        validate_certs: no 
+        headers:
+          Authorization: "Bearer {{ simplecloud_token }}"
+      register: result
+      until: result.json.domain_records is defined
+      retries: 10
+      delay: 5
+
+    - name: Debug variables
+      debug:
+        var: item.name
+      loop: "{{ result.json.domain_records }}"
+      when: item.data == "{{ hostvars['oldserver'].ansible_host }}"
+
+    - name: Update records
+      uri:
+        url: "https://api.simplecloud.ru/v3/domains/{{ simplecloud_dns_id }}/records/{{ item.id }}"
+        method: PUT
+        return_content: yes
+        body_format: json
+        validate_certs: no 
+        status_code: 204
+        headers:
+          Authorization: "Bearer {{ simplecloud_token }}"
+        body:
+          data: "{{ hostvars['newserver'].ansible_host }}"
+      register: records
+      retries: 10
+      delay: 5
+      until: records.status == 204
+      loop: "{{ result.json.domain_records }}"
+      when: item.data == "{{ hostvars['oldserver'].ansible_host }}"      

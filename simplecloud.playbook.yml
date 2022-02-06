@@ -4,3 +4,7 @@
   roles:
   - backup
 
+- hosts: localhost
+  gather_facts: false
+  roles:
+  - simplecloud_dns
