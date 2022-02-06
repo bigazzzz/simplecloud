@@ -1,0 +1,25 @@
+Debian:
+  packages:
+    - curl
+    - mc
+    - tmux
+    - git
+    - vim
+    - wget
+    - bash-completion
+    - zsh
+    - python3
+    - python3-mysqldb
+
+CentOS:
+  packages:
+    - curl
+    - mc
+    - tmux
+    - git
+    - vim
+    - wget
+    - bash-completion
+    - zsh
+    - python3
+    - python3-mysqldb

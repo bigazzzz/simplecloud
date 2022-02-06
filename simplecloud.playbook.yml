@@ -1,10 +1,21 @@
 ---
-- hosts: oldserver
+# - hosts: oldserver
+#   gather_facts: true
+#   roles:
+#   - backup
+
+- hosts: newserver
   gather_facts: true
   roles:
-  - backup
+  # - create_user
+  # - nginx
+  # - certbot
+  # - php_fpm
+  # - mysql
+  - default_software
 
-- hosts: localhost
-  gather_facts: false
-  roles:
-  - simplecloud_dns
+
+# - hosts: localhost
+#   gather_facts: false
+#   roles:
+#   - simplecloud_dns
