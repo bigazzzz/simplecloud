@@ -1,0 +1,17 @@
+---
+
+  - name: reload nginx
+    systemd:
+      name: nginx
+      state: reloaded
+
+  - name: restart mysql
+    systemd:
+      name: mysql
+      state: restarted
+
+  - name: flush privileges mysql
+    community.mysql.mysql_query:
+      login_user: root
+      login_password: "{{ mysql_root_password }}"
+      query: FLUSH PRIVILEGES

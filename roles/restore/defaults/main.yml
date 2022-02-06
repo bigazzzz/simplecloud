@@ -1,0 +1,17 @@
+sites:
+  - host: bigazzzz.ru
+    port: 80
+    path: ""
+    template: standart
+  - host: blog.bigazzzz.ru
+    port: 80
+    path: "/public"
+    template: standart
+  - host: it.bigazzzz.ru
+    port: 80
+    path: ""
+    template: standart
+  - host: tools.bigazzzz.ru
+    port: 80
+    path: ""
+    template: tools

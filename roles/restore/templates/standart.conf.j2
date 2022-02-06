@@ -1,0 +1,11 @@
+server {
+    listen          {{ item.port }};
+    server_name     www.{{ item.host }};
+    rewrite         ^ http://{{ item.host }}$request_uri? permanent; #301 redirect
+}
+
+server {
+    server_name     {{ item.host }}; 
+    root            /var/www/{{ item.host }}{{ item.path }};
+    include         snippets/standart-sites.conf;
+}

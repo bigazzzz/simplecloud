@@ -1,0 +1,53 @@
+---
+
+  - name: Copy site configs
+    template:
+      src: "{{ item.template }}.conf.j2"
+      dest: "/etc/nginx/sites-available/{{ item.host }}"
+    loop: "{{ sites }}"
+
+  - name: Enable sites
+    file:
+      src: "/etc/nginx/sites-available/{{ item.host }}"
+      dest: "/etc/nginx/sites-enabled/{{ item.host }}"
+      state: link
+    loop: "{{ sites }}"
+    notify:
+      - reload nginx
+  
+  - name: Remove default site
+    file:
+      path: "/etc/nginx/sites-enabled/default"
+      state: absent
+    notify:
+      - reload nginx
+
+  - name: Unarchive www.tar.gz
+    unarchive:
+      src: "{{ backup_directory }}/oldserver/backup/www.tar.gz"
+      dest: "/var/"
+      owner: www-data
+      copy: yes
+      
+  - name: Copy mysqldump to remote host
+    copy:
+      src: "{{ backup_directory }}/oldserver/backup/mysqldump.sql"
+      dest: "/tmp/mysqldump.sql"
+
+  - name: Mysqldump restore all databases
+    mysql_db:
+      login_user: root
+      login_password: "{{ mysql_root_password }}"
+      encoding: utf8
+      state: import
+      name: all
+      target: "/tmp/mysqldump.sql"
+    notify:
+      - flush privileges mysql
+      - restart mysql
+
+  - name: Remove dump file
+    file:
+      path: "/tmp/mysqldump.sql"
+      state: absent
+
