@@ -1,0 +1,96 @@
+---
+- hosts: localhost
+  gather_facts: no
+
+  vars:
+    tmpdir: "/tmp/le/"
+    domain: "bigazzzz.ru"
+    account_key: "le-account-key.pem"
+    keyname: "star-bigazzzz_ru-key.pem"
+    csrname: "star-bigazzzz_ru.csr"
+    certname: "star-bigazzzz_ru.pem"
+    fullchain: "star-bigazzzz_ru-fullchain.pem"
+    common_name: "*.bigazzzz.ru"
+    country: "RU"
+    email: "admin@bigazzzz.ru"
+
+  tasks:
+  - name: localhost | create temp dir
+    file:
+      path: "{{ tmpdir }}"
+      state: directory
+
+  - name: localhost | create temp account key
+    openssl_privatekey:
+      path: "{{ tmpdir }}{{ account_key }}"
+
+  - name: localhost | create private key
+    openssl_privatekey:
+      path: "{{ tmpdir }}{{ keyname }}"
+
+  - name: localhost | create CSR
+    openssl_csr:
+      path: "{{ tmpdir }}{{ csrname }}"
+      privatekey_path: "{{ tmpdir }}{{ keyname }}"
+      common_name: "{{ common_name }}"
+      country_name: "{{ country }}"
+      organization_name: "{{ domain }}"
+      email_address: "{{ email }}"
+
+  - name: LetsEncrypt | submit request
+    acme_certificate:
+      account_key_src: "{{ tmpdir }}{{ account_key }}"
+      account_email: "{{ email }}"
+      src: "{{ tmpdir }}{{ csrname }}"
+      fullchain_dest: "{{ tmpdir }}{{ certname }}"
+      challenge: dns-01
+      acme_directory: https://acme-staging-v02.api.letsencrypt.org/directory
+      acme_version: 2
+      terms_agreed: yes
+      remaining_days: 60
+    register: challenge
+
+  - name: Memset | create DNS challenge record
+    memset_zone_record:
+      api_key: "{{ memset_dns_api_key }}"
+      state: present
+      zone: "{{ domain }}"
+      type: TXT
+      record: "{{ challenge['challenge_data']['*.bigazzzz.ru']['dns-01']['resource'] }}"
+      data: "{{ challenge['challenge_data']['*.bigazzzz.ru']['dns-01']['resource_value'] }}"
+
+  - name: Memset | request DNS reload
+    memset_dns_reload:
+      api_key: "{{ memset_dns_api_key }}"
+      poll: true
+
+  - name: LetsEncrypt | retrieve cert
+    acme_certificate:
+      account_key_src: "{{ tmpdir }}{{ account_key }}"
+      account_email: "{{ email }}"
+      src: "{{ tmpdir }}{{ csrname }}"
+      dest: "{{ tmpdir }}{{ certname }}"
+      fullchain_dest: "{{ tmpdir }}{{ fullchain }}"
+      challenge: dns-01
+      acme_directory: https://acme-staging-v02.api.letsencrypt.org/directory
+      acme_version: 2
+      terms_agreed: yes
+      remaining_days: 60
+      data: "{{ challenge }}"
+    register: cert_retrieval
+
+  - name: Memset | delete DNS challenge record
+    memset_zone_record:
+      api_key: "{{ memset_dns_api_key }}"
+      state: absent
+      zone: domain.com
+      type: TXT
+      record: "{{ challenge['challenge_data']['*.bigazzzz.ru']['dns-01']['resource'] }}"
+      data: "{{ challenge['challenge_data']['*.bigazzzz.ru']['dns-01']['resource_value'] }}"
+    when: cert_retrieval is changed
+
+  - name: localhost | remove the account key
+    file:
+      path: "{{ tmpdir }}{{ account_key }}"
+      state: absent
+    when: cert_retrieval is changed
