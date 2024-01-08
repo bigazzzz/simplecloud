@@ -1,4 +1,4 @@
-php_version: "7.4"
+php_version: "8.1"
 Debian:
   packages:
     - nginx
@@ -7,7 +7,7 @@ Debian:
     - python3-pymysql
     - php{{ php_version }}-fpm
     - php{{ php_version }}-mysql
-    - php{{ php_version }}-curl 
+    - php{{ php_version }}-curl
     - php{{ php_version }}-zip
     - php{{ php_version }}-gd
     - php{{ php_version }}-mbstring
@@ -24,5 +24,3 @@ CentOS:
     - zsh
     - python3
     - python3-mysqldb
-
-
