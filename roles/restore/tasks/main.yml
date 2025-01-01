@@ -14,7 +14,7 @@
     loop: "{{ sites }}"
     notify:
       - reload nginx
-  
+
   - name: Remove default site
     file:
       path: "/etc/nginx/sites-enabled/default"
@@ -28,7 +28,7 @@
       dest: "/var/"
       owner: www-data
       copy: yes
-      
+
   - name: Copy mysqldump to remote host
     copy:
       src: "{{ backup_directory }}/oldserver/backup/mysqldump.sql"
@@ -36,6 +36,7 @@
 
   - name: Mysqldump restore all databases
     mysql_db:
+      login_unix_socket: /var/run/mysqld/mysqld.sock
       login_user: root
       login_password: "{{ mysql_root_password }}"
       encoding: utf8
@@ -50,4 +51,3 @@
     file:
       path: "/tmp/mysqldump.sql"
       state: absent
-

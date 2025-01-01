@@ -1,3 +1,4 @@
+---
     - name: Create /backup directory for backup
       file:
         path: /backup
@@ -5,20 +6,21 @@
 
     - name: Archive /etc directory
       archive:
-        path: 
+        path:
         - /etc
         dest: "/backup/etc.tar.gz"
         format: gz
 
     - name: Archive /var/www directory
       archive:
-        path: 
+        path:
         - /var/www
         dest: "/backup/www.tar.gz"
         format: gz
 
     - name: Mysqldump all databases
       mysql_db:
+        login_unix_socket: /var/run/mysqld/mysqld.sock
         login_user: root
         login_password: "{{ mysql_root_password }}"
         encoding: utf8
@@ -45,4 +47,3 @@
       file:
         path: "/backup/"
         state: absent
-
